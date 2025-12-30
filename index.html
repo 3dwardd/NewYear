@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>180° Viewer with Angle Display</title>
+  <title>180° Viewer with Distance Effect</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
@@ -11,13 +11,13 @@
   <div id="angleDisplay">Angle: 0°</div>
 
   <a-scene embedded>
-    <!-- Large sphere with your panorama image -->
+    <!-- Large sphere with panorama image -->
     <a-entity 
-      geometry="primitive: sphere; radius: 100; segmentsWidth: 64; segmentsHeight: 64"
-      material="shader: flat; src: panorama1.jpeg; side: back">
+      geometry="primitive: sphere; radius: 300; segmentsWidth: 64; segmentsHeight: 64"
+      material="shader: flat; src: flowers1.jpeg; side: back">
     </a-entity>
 
-    <!-- Camera with look-controls -->
+    <!-- Camera placed farther back -->
     <a-entity id="camera" camera look-controls position="0 1.6 0"></a-entity>
   </a-scene>
 
