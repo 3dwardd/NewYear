@@ -5,17 +5,18 @@
   <title>180° Viewer with Angle Display</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
-  <!-- A-Frame library -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 </head>
 <body>
-  <!-- Angle display overlay -->
   <div id="angleDisplay">Angle: 0°</div>
 
-  <!-- 180° scene -->
   <a-scene embedded>
-    <!-- Your HD panorama image -->
-    <a-sky id="sky" src="panorama1.jpg" rotation="0 0 0"></a-sky>
+    <!-- Large sphere with your panorama image -->
+    <a-entity 
+      geometry="primitive: sphere; radius: 100; segmentsWidth: 64; segmentsHeight: 64"
+      material="shader: flat; src: panorama1.jpeg; side: back">
+    </a-entity>
+
     <!-- Camera with look-controls -->
     <a-entity id="camera" camera look-controls position="0 1.6 0"></a-entity>
   </a-scene>

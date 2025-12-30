@@ -1,7 +1,6 @@
 const camera = document.querySelector('#camera');
 const angleDisplay = document.getElementById('angleDisplay');
 
-// Clamp helper
 function clamp(val, min, max) {
   return Math.max(min, Math.min(max, val));
 }
@@ -21,5 +20,4 @@ function updateAngle() {
   angleDisplay.textContent = `Angle: ${yaw}°`;
 }
 
-// Update every 100ms
 setInterval(updateAngle, 100);
