@@ -2,19 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>120° Image Viewer</title>
+  <title>Framed Image Viewer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 </head>
 <body>
-  <div id="angleDisplay">Angle: 0°</div>
-
   <a-scene embedded>
-    <!-- Flat image placed 5 units away -->
-    <a-plane src="flowers1.jpeg" position="0 1.6 -5" width="6" height="4"></a-plane>
+    <!-- Frame background -->
+    <a-plane color="#333" position="0 1.6 -5" width="6.2" height="4.2"></a-plane>
 
-    <!-- Camera with look-controls -->
+    <!-- Your image inside the frame -->
+    <a-plane src="flowers1.jpeg" position="0 1.6 -5.01" width="6" height="4"></a-plane>
+
+    <!-- Camera with limited look-controls -->
     <a-entity id="camera" camera look-controls position="0 1.6 0"></a-entity>
   </a-scene>
 
