@@ -8,11 +8,11 @@ function clamp(val, min, max) {
 function updateAngle() {
   let rotation = camera.getAttribute('rotation');
 
-  // Wider clamp: allow -120° to +120° horizontally (240° total)
-  rotation.y = clamp(rotation.y, -120, 120);
+  // Clamp yaw (Y axis) to -60° to +60° → 120° total
+  rotation.y = clamp(rotation.y, -60, 60);
 
-  // Allow -80° to +80° vertically (160° total)
-  rotation.x = clamp(rotation.x, -80, 80);
+  // Clamp pitch (X axis) to -40° to +40° → 80° total
+  rotation.x = clamp(rotation.x, -40, 40);
 
   camera.setAttribute('rotation', rotation);
 
