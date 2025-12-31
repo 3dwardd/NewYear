@@ -200,8 +200,8 @@ function createImageBox(x, y, z, angle, imageUrl, textContent) {
     // Create box group
     const group = new THREE.Group();
     
-    // Create screen (plane with texture) - LARGER SIZE
-    const screenGeometry = new THREE.PlaneGeometry(5, 3.5); // Increased from 3x2 to 5x3.5
+    // Create screen (plane with texture) - MUCH LARGER SIZE
+    const screenGeometry = new THREE.PlaneGeometry(8, 6); // Increased to 8x6 for much larger display
     const loader = new THREE.TextureLoader();
     
     loader.load(imageUrl, (texture) => {
@@ -219,7 +219,7 @@ function createImageBox(x, y, z, angle, imageUrl, textContent) {
             side: THREE.DoubleSide
         });
         const screen = new THREE.Mesh(screenGeometry, screenMaterial);
-        screen.position.set(0, 0.8, 0); // Adjusted for larger size
+        screen.position.set(0, 1.2, 0); // Adjusted Y position for larger size
         group.add(screen);
     }, undefined, (error) => {
         // Fallback if image fails to load
@@ -228,15 +228,15 @@ function createImageBox(x, y, z, angle, imageUrl, textContent) {
             side: THREE.DoubleSide
         });
         const screen = new THREE.Mesh(screenGeometry, screenMaterial);
-        screen.position.set(0, 0.8, 0);
+        screen.position.set(0, 1.2, 0);
         group.add(screen);
     });
     
     // Create frame - LARGER to match screen
-    const frameGeometry = new THREE.BoxGeometry(5.2, 3.7, 0.2);
+    const frameGeometry = new THREE.BoxGeometry(8.2, 6.2, 0.2);
     const frameMaterial = new THREE.MeshStandardMaterial({ color: 0x333333 });
     const frame = new THREE.Mesh(frameGeometry, frameMaterial);
-    frame.position.set(0, 0.8, -0.1);
+    frame.position.set(0, 1.2, -0.1);
     group.add(frame);
     
     // Position the group
@@ -341,8 +341,8 @@ function animate360() {
 function updateTextLabels() {
     textLabels.forEach(({ element, group }) => {
         // Get world position of the text (centered below image)
-        // Image center is at (0, 0.8, 0) in local space, text should be below it
-        const textLocalPos = new THREE.Vector3(0, 0.8 - 2.2, 0); // Centered horizontally, below image
+        // Image center is at (0, 1.2, 0) in local space, text should be below it
+        const textLocalPos = new THREE.Vector3(0, 1.2 - 3.5, 0); // Centered horizontally, below larger image
         const worldPos = textLocalPos.clone();
         worldPos.applyMatrix4(group.matrixWorld);
         
