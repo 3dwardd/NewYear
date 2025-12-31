@@ -160,14 +160,12 @@ function init360Environment() {
         { url: 'picture5.png', text: 'Text content 5' }
     ];
     
-    const radius = 4; // Closer to user
-    // Arrange images in a semicircle (180 degrees) for better viewing
-    const startAngle = -Math.PI / 2; // Start from left (-90 degrees)
-    const endAngle = Math.PI / 2; // End at right (+90 degrees)
-    const angleStep = (endAngle - startAngle) / (images.length - 1);
+    const radius = 6; // Increased radius for more spacing
+    // Arrange images in a full circle (360 degrees) with better spacing
+    const angleStep = (Math.PI * 2) / images.length; // Full circle divided by number of images
     
     images.forEach((img, index) => {
-        const angle = startAngle + (index * angleStep);
+        const angle = index * angleStep;
         const x = Math.cos(angle) * radius;
         const z = Math.sin(angle) * radius;
         
@@ -264,9 +262,7 @@ function createImageBox(x, y, z, angle, imageUrl, textContent) {
 function setup360Controls() {
     let isDragging = false;
     let previousMousePosition = { x: 0, y: 0 };
-    let currentRotationY = 0; // Track horizontal rotation
-    const minRotation = -Math.PI / 2; // -90 degrees (left limit)
-    const maxRotation = Math.PI / 2;  // +90 degrees (right limit)
+    let currentRotationY = 0; // Track horizontal rotation (full 360 degrees)
     
     renderer.domElement.addEventListener('mousedown', (e) => {
         isDragging = true;
@@ -278,12 +274,14 @@ function setup360Controls() {
         
         const deltaX = e.clientX - previousMousePosition.x;
         
-        // Only horizontal rotation (180 degrees total: -90 to +90)
+        // Full 360-degree horizontal rotation on X-axis
         const rotationSpeed = 0.005;
         currentRotationY -= deltaX * rotationSpeed;
         
-        // Clamp rotation to 180 degrees (-90 to +90)
-        currentRotationY = Math.max(minRotation, Math.min(maxRotation, currentRotationY));
+        // Keep rotation within 0 to 2π for full 360 degrees
+        if (currentRotationY > Math.PI * 2) currentRotationY -= Math.PI * 2;
+        if (currentRotationY < 0) currentRotationY += Math.PI * 2;
+        
         camera.rotation.y = currentRotationY;
         
         // Keep vertical rotation stable (no vertical movement)
@@ -312,7 +310,11 @@ function setup360Controls() {
         
         const rotationSpeed = 0.005;
         currentRotationY -= deltaX * rotationSpeed;
-        currentRotationY = Math.max(minRotation, Math.min(maxRotation, currentRotationY));
+        
+        // Keep rotation within 0 to 2π for full 360 degrees
+        if (currentRotationY > Math.PI * 2) currentRotationY -= Math.PI * 2;
+        if (currentRotationY < 0) currentRotationY += Math.PI * 2;
+        
         camera.rotation.y = currentRotationY;
         camera.rotation.x = 0; // Keep stable
         
@@ -418,13 +420,33 @@ function startFireworks() {
     const fireworks = [];
     const particles = [];
     
+    // Color palette for realistic fireworks (red, blue, green, yellow, purple, orange, pink, cyan)
+    const fireworkColors = [
+        { hue: 0, name: 'red' },      // Red
+        { hue: 240, name: 'blue' },   // Blue
+        { hue: 120, name: 'green' },  // Green
+        { hue: 60, name: 'yellow' },  // Yellow
+        { hue: 270, name: 'purple' }, // Purple
+        { hue: 30, name: 'orange' },  // Orange
+        { hue: 330, name: 'pink' },   // Pink
+        { hue: 180, name: 'cyan' },   // Cyan
+        { hue: 300, name: 'magenta' }, // Magenta
+        { hue: 15, name: 'gold' }     // Gold
+    ];
+    
+    function getRandomColor() {
+        const color = fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
+        // Add some variation to the hue for more natural look
+        return color.hue + (Math.random() * 20 - 10);
+    }
+    
     class Firework {
         constructor() {
             this.x = Math.random() * canvas.width;
             this.y = canvas.height;
             this.targetY = Math.random() * (canvas.height * 0.5) + canvas.height * 0.1;
             this.speed = Math.random() * 3 + 2;
-            this.hue = Math.random() * 60 + 200; // Blue to red range
+            this.hue = getRandomColor(); // Random colorful hue
             this.exploded = false;
         }
         
@@ -439,9 +461,13 @@ function startFireworks() {
         
         explode() {
             this.exploded = true;
-            const particleCount = 50;
+            const particleCount = 80; // More particles for richer effect
+            const baseHue = this.hue;
+            
             for (let i = 0; i < particleCount; i++) {
-                particles.push(new Particle(this.x, this.y, this.hue));
+                // Each particle can have slightly different hue for more colorful effect
+                const hueVariation = baseHue + (Math.random() * 40 - 20);
+                particles.push(new Particle(this.x, this.y, hueVariation));
             }
         }
         
@@ -460,14 +486,15 @@ function startFireworks() {
             this.x = x;
             this.y = y;
             this.hue = hue;
-            this.speed = Math.random() * 5 + 2;
+            this.speed = Math.random() * 6 + 3;
             this.angle = Math.random() * Math.PI * 2;
             this.vx = Math.cos(this.angle) * this.speed;
             this.vy = Math.sin(this.angle) * this.speed;
-            this.gravity = 0.1;
-            this.friction = 0.98;
+            this.gravity = 0.15;
+            this.friction = 0.97;
             this.life = 1;
-            this.decay = Math.random() * 0.02 + 0.01;
+            this.decay = Math.random() * 0.02 + 0.015;
+            this.size = Math.random() * 3 + 1.5;
         }
         
         update() {
@@ -481,18 +508,23 @@ function startFireworks() {
         
         draw() {
             ctx.beginPath();
-            ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
-            ctx.fillStyle = `hsla(${this.hue}, 100%, 50%, ${this.life})`;
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            // Use bright, saturated colors with glow effect
+            const alpha = this.life;
+            ctx.fillStyle = `hsla(${this.hue}, 100%, 60%, ${alpha})`;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = `hsl(${this.hue}, 100%, 50%)`;
             ctx.fill();
+            ctx.shadowBlur = 0;
         }
     }
     
     function animate() {
-        ctx.fillStyle = 'rgba(10, 14, 39, 0.2)';
+        ctx.fillStyle = 'rgba(10, 14, 39, 0.15)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        // Add new firework randomly
-        if (Math.random() < 0.05) {
+        // Add new firework more frequently for continuous colorful display
+        if (Math.random() < 0.08) {
             fireworks.push(new Firework());
         }
         
