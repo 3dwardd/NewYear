@@ -153,11 +153,11 @@ function init360Environment() {
     
     // Create 5 image boxes arranged around the x-axis
     const images = [
-        { url: 'pic1.png', text: "Here’s to a year that starts with fresh energy and endless possibilities." },
-        { url: 'pic2.png', text: "May each day bring you reasons to smile and moments to feel proud of yourself." },
+        { url: 'pic2.png', text: "Here’s to a year that starts with fresh energy and endless possibilities./May each day bring you reasons to smile and moments to feel proud of yourself." },
         { url: 'pic3.png', text: "May your focus guide you through challenges and turn them into victories!." },
-        { url: 'pic4.png', text: "May you find peace and joy even through the things that keep you occupied." },
-        { url: 'pic5.png', text: "And most of all, may your 2026 be full of laughter, joy, and filled with happiness!" }
+        { url: 'pic4.png', text: "May you find peace and joy even through the things that keep you occupied" },
+        { url: 'pic5.png', text: "And most of all, may your 2026 be full of laughter, joy, and filled with happiness!" },
+        { url: 'pic1.png', text: "Here’s to a year that starts with fresh energy and endless possibilities." }
     ];
     
     const radius = 8; // Increased radius for more spacing between images
