@@ -161,10 +161,13 @@ function init360Environment() {
     ];
     
     const radius = 4; // Closer to user
-    const angleStep = (Math.PI * 2) / images.length;
+    // Arrange images in a semicircle (180 degrees) for better viewing
+    const startAngle = -Math.PI / 2; // Start from left (-90 degrees)
+    const endAngle = Math.PI / 2; // End at right (+90 degrees)
+    const angleStep = (endAngle - startAngle) / (images.length - 1);
     
     images.forEach((img, index) => {
-        const angle = index * angleStep;
+        const angle = startAngle + (index * angleStep);
         const x = Math.cos(angle) * radius;
         const z = Math.sin(angle) * radius;
         
@@ -204,6 +207,15 @@ function createImageBox(x, y, z, angle, imageUrl, textContent) {
     const loader = new THREE.TextureLoader();
     
     loader.load(imageUrl, (texture) => {
+        // Improve texture quality - prevent glitching
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.generateMipmaps = true;
+        if (renderer && renderer.capabilities) {
+            texture.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 16);
+        }
+        texture.flipY = false;
+        
         const screenMaterial = new THREE.MeshBasicMaterial({ 
             map: texture,
             side: THREE.DoubleSide
@@ -252,6 +264,9 @@ function createImageBox(x, y, z, angle, imageUrl, textContent) {
 function setup360Controls() {
     let isDragging = false;
     let previousMousePosition = { x: 0, y: 0 };
+    let currentRotationY = 0; // Track horizontal rotation
+    const minRotation = -Math.PI / 2; // -90 degrees (left limit)
+    const maxRotation = Math.PI / 2;  // +90 degrees (right limit)
     
     renderer.domElement.addEventListener('mousedown', (e) => {
         isDragging = true;
@@ -262,15 +277,17 @@ function setup360Controls() {
         if (!isDragging) return;
         
         const deltaX = e.clientX - previousMousePosition.x;
-        const deltaY = e.clientY - previousMousePosition.y;
         
-        // Rotate camera around Y axis (horizontal)
+        // Only horizontal rotation (180 degrees total: -90 to +90)
         const rotationSpeed = 0.005;
-        camera.rotation.y -= deltaX * rotationSpeed;
+        currentRotationY -= deltaX * rotationSpeed;
         
-        // Limit vertical rotation
-        camera.rotation.x -= deltaY * rotationSpeed;
-        camera.rotation.x = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, camera.rotation.x));
+        // Clamp rotation to 180 degrees (-90 to +90)
+        currentRotationY = Math.max(minRotation, Math.min(maxRotation, currentRotationY));
+        camera.rotation.y = currentRotationY;
+        
+        // Keep vertical rotation stable (no vertical movement)
+        camera.rotation.x = 0;
         
         previousMousePosition = { x: e.clientX, y: e.clientY };
     });
@@ -292,12 +309,12 @@ function setup360Controls() {
         e.preventDefault();
         
         const deltaX = e.touches[0].clientX - previousMousePosition.x;
-        const deltaY = e.touches[0].clientY - previousMousePosition.y;
         
         const rotationSpeed = 0.005;
-        camera.rotation.y -= deltaX * rotationSpeed;
-        camera.rotation.x -= deltaY * rotationSpeed;
-        camera.rotation.x = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, camera.rotation.x));
+        currentRotationY -= deltaX * rotationSpeed;
+        currentRotationY = Math.max(minRotation, Math.min(maxRotation, currentRotationY));
+        camera.rotation.y = currentRotationY;
+        camera.rotation.x = 0; // Keep stable
         
         previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     });
@@ -369,12 +386,146 @@ function cleanup360Environment() {
 }
 
 // Final Greeting Section
+let fireworksAnimation = null;
+
 function showFinalGreeting() {
     const greetingSection = document.getElementById('finalGreetingSection');
     const greetingText = document.getElementById('finalGreeting');
     
     greetingText.textContent = `HAPPY NEW YEAR ${userName.toUpperCase()}!`;
     greetingSection.classList.add('active', 'fade-in');
+    
+    // Start fireworks animation
+    setTimeout(() => {
+        startFireworks();
+    }, 100);
+}
+
+function stopFireworks() {
+    if (fireworksAnimation) {
+        cancelAnimationFrame(fireworksAnimation);
+        fireworksAnimation = null;
+    }
+}
+
+function startFireworks() {
+    const canvas = document.getElementById('fireworksCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    const fireworks = [];
+    const particles = [];
+    
+    class Firework {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = canvas.height;
+            this.targetY = Math.random() * (canvas.height * 0.5) + canvas.height * 0.1;
+            this.speed = Math.random() * 3 + 2;
+            this.hue = Math.random() * 60 + 200; // Blue to red range
+            this.exploded = false;
+        }
+        
+        update() {
+            if (!this.exploded) {
+                this.y -= this.speed;
+                if (this.y <= this.targetY) {
+                    this.explode();
+                }
+            }
+        }
+        
+        explode() {
+            this.exploded = true;
+            const particleCount = 50;
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle(this.x, this.y, this.hue));
+            }
+        }
+        
+        draw() {
+            if (!this.exploded) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                ctx.fillStyle = `hsl(${this.hue}, 100%, 50%)`;
+                ctx.fill();
+            }
+        }
+    }
+    
+    class Particle {
+        constructor(x, y, hue) {
+            this.x = x;
+            this.y = y;
+            this.hue = hue;
+            this.speed = Math.random() * 5 + 2;
+            this.angle = Math.random() * Math.PI * 2;
+            this.vx = Math.cos(this.angle) * this.speed;
+            this.vy = Math.sin(this.angle) * this.speed;
+            this.gravity = 0.1;
+            this.friction = 0.98;
+            this.life = 1;
+            this.decay = Math.random() * 0.02 + 0.01;
+        }
+        
+        update() {
+            this.vx *= this.friction;
+            this.vy *= this.friction;
+            this.vy += this.gravity;
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life -= this.decay;
+        }
+        
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+            ctx.fillStyle = `hsla(${this.hue}, 100%, 50%, ${this.life})`;
+            ctx.fill();
+        }
+    }
+    
+    function animate() {
+        ctx.fillStyle = 'rgba(10, 14, 39, 0.2)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Add new firework randomly
+        if (Math.random() < 0.05) {
+            fireworks.push(new Firework());
+        }
+        
+        // Update and draw fireworks
+        for (let i = fireworks.length - 1; i >= 0; i--) {
+            fireworks[i].update();
+            fireworks[i].draw();
+            
+            if (fireworks[i].exploded && particles.length === 0) {
+                fireworks.splice(i, 1);
+            }
+        }
+        
+        // Update and draw particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+            particles[i].update();
+            particles[i].draw();
+            
+            if (particles[i].life <= 0) {
+                particles.splice(i, 1);
+            }
+        }
+        
+        fireworksAnimation = requestAnimationFrame(animate);
+    }
+    
+    animate();
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
 }
 
 // Handle window resize

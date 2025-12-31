@@ -189,6 +189,9 @@ body {
     cursor: pointer;
     font-weight: bold;
     transition: all 0.3s ease;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .continue-btn:hover {
@@ -234,10 +237,24 @@ body {
 /* Final Greeting Section */
 #finalGreetingSection {
     background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+#fireworksCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
 }
 
 .greeting-container {
     text-align: center;
+    position: relative;
+    z-index: 2;
 }
 
 .greeting-text {
