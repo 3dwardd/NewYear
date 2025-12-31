@@ -142,7 +142,7 @@ body {
     font-size: 12em;
     font-weight: bold;
     color: #ffd700;
-    text-shadow:
+    text-shadow: 
         0 0 20px rgba(255, 215, 0, 0.8),
         0 0 40px rgba(255, 215, 0, 0.6),
         0 0 60px rgba(255, 215, 0, 0.4);
@@ -210,22 +210,29 @@ body {
     position: relative;
 }
 
-/* 🔑 ONLY TEXT CHANGES ARE HERE */
 .image-label {
     position: absolute;
     color: #ffd700;
-    font-size: 18px;              /* smaller base size */
+    font-size: 15px;
     font-weight: bold;
-    text-shadow:
-        0 0 6px rgba(255, 215, 0, 0.9),
-        0 0 12px rgba(255, 215, 0, 0.7);
+    text-shadow: 
+        0 0 10px rgba(255, 215, 0, 0.9),
+        0 0 20px rgba(255, 215, 0, 0.7),
+        0 0 30px rgba(255, 215, 0, 0.5);
     pointer-events: none;
-    white-space: normal;          /* allow wrapping */
-    word-break: break-word;
-    max-width: 160px;             /* force vertical stacking */
+    white-space: nowrap;
     z-index: 10;
     text-align: center;
     font-family: 'Arial', sans-serif;
+    width: auto;
+}
+
+#continueSpaceBtn {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
 }
 
 /* Final Greeting Section */
@@ -260,13 +267,18 @@ body {
     font-size: 6em;
     font-weight: bold;
     color: #ffd700;
-    text-shadow:
+    text-shadow: 
         0 0 20px rgba(255, 215, 0, 0.8),
         0 0 40px rgba(255, 140, 0, 0.6),
         0 0 60px rgba(255, 140, 0, 0.4),
         0 0 80px rgba(255, 140, 0, 0.2);
     animation: flash 1.5s ease-in-out infinite;
     letter-spacing: 0.1em;
+    display: block;
+    visibility: visible;
+    opacity: 1;
+    position: relative;
+    z-index: 11;
 }
 
 @keyframes flash {
@@ -280,29 +292,49 @@ body {
     }
 }
 
+/* Fade transitions */
+.fade-out {
+    animation: fadeOut 0.5s ease-out forwards;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in forwards;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .year-text {
         font-size: 6em;
     }
-
+    
     .greeting-text {
         font-size: 3em;
     }
-
+    
     .question-box {
         padding: 30px 40px;
     }
-
+    
     .question-box h2 {
         font-size: 1.8em;
-    }
-
-    /* 🔑 MOBILE TEXT FIX ONLY */
-    .image-label {
-        font-size: 12px;
-        max-width: 110px;
-        line-height: 1.15;
     }
 }
 
