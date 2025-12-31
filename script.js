@@ -2,6 +2,7 @@
 let userName = '';
 let scene, camera, renderer;
 let imageBoxes = [];
+let textLabels = [];
 let is360Active = false;
 
 // Initialize the application
@@ -152,14 +153,14 @@ function init360Environment() {
     
     // Create 5 image boxes arranged around the x-axis
     const images = [
-        { url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800', message: 'New Beginnings' },
-        { url: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=800', message: 'Dream Big' },
-        { url: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=800', message: 'Endless Possibilities' },
-        { url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800', message: 'Adventure Awaits' },
-        { url: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800', message: 'Celebrate Life' }
+        { url: 'picture1.jpg', text: 'Text content 1' },
+        { url: 'picture2.jpg', text: 'Text content 2' },
+        { url: 'picture3.jpg', text: 'Text content 3' },
+        { url: 'picture4.jpg', text: 'Text content 4' },
+        { url: 'picture5.jpg', text: 'Text content 5' }
     ];
     
-    const radius = 8;
+    const radius = 4; // Closer to user
     const angleStep = (Math.PI * 2) / images.length;
     
     images.forEach((img, index) => {
@@ -167,7 +168,7 @@ function init360Environment() {
         const x = Math.cos(angle) * radius;
         const z = Math.sin(angle) * radius;
         
-        createImageBox(x, 0, z, angle, img.url, img.message);
+        createImageBox(x, 0, z, angle, img.url, img.text);
     });
     
     // Add controls for 360 view
@@ -194,12 +195,12 @@ function createStarField() {
     scene.add(stars);
 }
 
-function createImageBox(x, y, z, angle, imageUrl, message) {
+function createImageBox(x, y, z, angle, imageUrl, textContent) {
     // Create box group
     const group = new THREE.Group();
     
-    // Create screen (plane with texture)
-    const screenGeometry = new THREE.PlaneGeometry(3, 2);
+    // Create screen (plane with texture) - LARGER SIZE
+    const screenGeometry = new THREE.PlaneGeometry(5, 3.5); // Increased from 3x2 to 5x3.5
     const loader = new THREE.TextureLoader();
     
     loader.load(imageUrl, (texture) => {
@@ -208,7 +209,7 @@ function createImageBox(x, y, z, angle, imageUrl, message) {
             side: THREE.DoubleSide
         });
         const screen = new THREE.Mesh(screenGeometry, screenMaterial);
-        screen.position.set(0, 0.5, 0);
+        screen.position.set(0, 0.8, 0); // Adjusted for larger size
         group.add(screen);
     }, undefined, (error) => {
         // Fallback if image fails to load
@@ -217,23 +218,32 @@ function createImageBox(x, y, z, angle, imageUrl, message) {
             side: THREE.DoubleSide
         });
         const screen = new THREE.Mesh(screenGeometry, screenMaterial);
-        screen.position.set(0, 0.5, 0);
+        screen.position.set(0, 0.8, 0);
         group.add(screen);
     });
     
-    // Create frame
-    const frameGeometry = new THREE.BoxGeometry(3.2, 2.2, 0.2);
+    // Create frame - LARGER to match screen
+    const frameGeometry = new THREE.BoxGeometry(5.2, 3.7, 0.2);
     const frameMaterial = new THREE.MeshStandardMaterial({ color: 0x333333 });
     const frame = new THREE.Mesh(frameGeometry, frameMaterial);
-    frame.position.set(0, 0.5, -0.1);
+    frame.position.set(0, 0.8, -0.1);
     group.add(frame);
     
     // Position the group
     group.position.set(x, y, z);
     group.lookAt(0, 0, 0);
     
-    // Store message for later use (could be displayed in UI)
-    group.userData = { message: message };
+    // Store text and position for HTML overlay
+    group.userData = { text: textContent, worldPos: new THREE.Vector3(x, y - 1.5, z) };
+    
+    // Create HTML text label overlay
+    const textDiv = document.createElement('div');
+    textDiv.className = 'image-label';
+    textDiv.textContent = textContent;
+    textDiv.id = `label-${imageBoxes.length}`;
+    document.getElementById('canvas-container').appendChild(textDiv);
+    
+    textLabels.push({ element: textDiv, group: group });
     
     scene.add(group);
     imageBoxes.push(group);
@@ -302,17 +312,50 @@ function animate360() {
     
     requestAnimationFrame(animate360);
     
-    // Rotate image boxes slightly for visual interest
-    imageBoxes.forEach((box, index) => {
-        box.rotation.y += 0.001;
-    });
-    
+    // Images stay steady - no rotation
     renderer.render(scene, camera);
+    
+    // Update text label positions
+    updateTextLabels();
+}
+
+function updateTextLabels() {
+    textLabels.forEach(({ element, group }) => {
+        // Get world position of the text (below image)
+        const worldPos = new THREE.Vector3(0, -1.5, 0);
+        worldPos.applyMatrix4(group.matrixWorld);
+        
+        // Project 3D position to 2D screen coordinates
+        worldPos.project(camera);
+        
+        const x = (worldPos.x * 0.5 + 0.5) * window.innerWidth;
+        const y = (worldPos.y * -0.5 + 0.5) * window.innerHeight;
+        
+        // Update label position
+        element.style.left = x + 'px';
+        element.style.top = y + 'px';
+        element.style.transform = 'translate(-50%, -50%)';
+        
+        // Hide if behind camera
+        if (worldPos.z > 1) {
+            element.style.display = 'none';
+        } else {
+            element.style.display = 'block';
+        }
+    });
 }
 
 function cleanup360Environment() {
     is360Active = false;
     const container = document.getElementById('canvas-container');
+    
+    // Remove text labels
+    textLabels.forEach(({ element }) => {
+        if (element.parentNode) {
+            element.parentNode.removeChild(element);
+        }
+    });
+    textLabels = [];
     
     if (renderer) {
         container.removeChild(renderer.domElement);
