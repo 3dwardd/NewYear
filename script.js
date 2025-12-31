@@ -243,8 +243,8 @@ function createImageBox(x, y, z, angle, imageUrl, textContent) {
     group.position.set(x, y, z);
     group.lookAt(0, 0, 0);
     
-    // Store text and position for HTML overlay - increased spacing between image and text
-    group.userData = { text: textContent, worldPos: new THREE.Vector3(x, y - 2.5, z) };
+    // Store text and position for HTML overlay - aligned with image center
+    group.userData = { text: textContent };
     
     // Create HTML text label overlay
     const textDiv = document.createElement('div');
@@ -340,8 +340,10 @@ function animate360() {
 
 function updateTextLabels() {
     textLabels.forEach(({ element, group }) => {
-        // Get world position of the text (below image) - increased spacing
-        const worldPos = new THREE.Vector3(0, -2.5, 0);
+        // Get world position of the text (centered below image)
+        // Image center is at (0, 0.8, 0) in local space, text should be below it
+        const textLocalPos = new THREE.Vector3(0, 0.8 - 2.2, 0); // Centered horizontally, below image
+        const worldPos = textLocalPos.clone();
         worldPos.applyMatrix4(group.matrixWorld);
         
         // Project 3D position to 2D screen coordinates
@@ -350,10 +352,11 @@ function updateTextLabels() {
         const x = (worldPos.x * 0.5 + 0.5) * window.innerWidth;
         const y = (worldPos.y * -0.5 + 0.5) * window.innerHeight;
         
-        // Update label position
+        // Update label position - centered alignment
         element.style.left = x + 'px';
         element.style.top = y + 'px';
         element.style.transform = 'translate(-50%, -50%)';
+        element.style.textAlign = 'center';
         
         // Hide if behind camera
         if (worldPos.z > 1) {
@@ -394,8 +397,21 @@ function showFinalGreeting() {
     const greetingSection = document.getElementById('finalGreetingSection');
     const greetingText = document.getElementById('finalGreeting');
     
-    greetingText.textContent = `HAPPY NEW YEAR ${userName.toUpperCase()}!`;
+    // Ensure section is visible
+    greetingSection.style.display = 'flex';
     greetingSection.classList.add('active', 'fade-in');
+    
+    // Set greeting text with user's name
+    if (userName && userName.trim() !== '') {
+        greetingText.textContent = `HAPPY NEW YEAR ${userName.toUpperCase()}!`;
+    } else {
+        greetingText.textContent = 'HAPPY NEW YEAR!';
+    }
+    
+    // Make sure text is visible
+    greetingText.style.display = 'block';
+    greetingText.style.visibility = 'visible';
+    greetingText.style.opacity = '1';
     
     // Start fireworks animation
     setTimeout(() => {
