@@ -153,11 +153,11 @@ function init360Environment() {
     
     // Create 5 image boxes arranged around the x-axis
     const images = [
-        { url: 'picture1.png', text: 'Text content 1' },
-        { url: 'picture2.png', text: 'Text content 2' },
-        { url: 'picture3.png', text: 'Text content 3' },
-        { url: 'picture4.png', text: 'Text content 4' },
-        { url: 'picture5.png', text: 'Text content 5' }
+        { url: 'picture1.1png', text: 'Here’s to a year that starts with fresh energy and endless possibilities' },
+        { url: 'picture2.1png', text: 'May each day bring you reasons to smile and moments to feel proud of yourself.' },
+        { url: 'picture3.1png', text: 'May your focus guide you through challenges and turn them into victories!' },
+        { url: 'picture4.1png', text: 'May you find peace and joy through things that make you occupied' },
+        { url: 'picture5.1png', text: 'And most of all, may your 2026 be full of laughter, joy, and filled with happiness!.' }
     ];
     
     const radius = 8; // Increased radius for more spacing between images
@@ -424,6 +424,43 @@ function stopFireworks() {
         cancelAnimationFrame(fireworksAnimation);
         fireworksAnimation = null;
     }
+}
+
+function setupFinalImageBox() {
+    const imageBox = document.getElementById('finalImageBox');
+    if (!imageBox) return;
+    const img = document.getElementById('finalImage');
+    const placeholder = imageBox.querySelector('.image-placeholder');
+    const input = document.getElementById('finalImageInput');
+
+    imageBox.addEventListener('click', () => input.click());
+
+    input.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            img.src = URL.createObjectURL(file);
+            img.style.display = 'block';
+            img.onload = () => URL.revokeObjectURL(img.src);
+            placeholder.style.display = 'none';
+        }
+    });
+
+    ['dragover', 'dragenter'].forEach(ev => {
+        imageBox.addEventListener(ev, (e) => { e.preventDefault(); imageBox.classList.add('dragover'); });
+    });
+    ['dragleave', 'drop'].forEach(ev => {
+        imageBox.addEventListener(ev, (e) => { e.preventDefault(); imageBox.classList.remove('dragover'); });
+    });
+
+    imageBox.addEventListener('drop', (e) => {
+        const file = e.dataTransfer.files && e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            img.src = URL.createObjectURL(file);
+            img.style.display = 'block';
+            img.onload = () => URL.revokeObjectURL(img.src);
+            placeholder.style.display = 'none';
+        }
+    });
 }
 
 function startFireworks() {
