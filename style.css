@@ -1,9 +1,15 @@
+/* ===============================
+   GLOBAL RESET
+================================ */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* ===============================
+   BODY
+================================ */
 body {
     font-family: 'Arial', sans-serif;
     background-color: #0a0e27;
@@ -13,12 +19,12 @@ body {
     width: 100vw;
 }
 
+/* ===============================
+   SECTIONS
+================================ */
 .section {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     display: none;
     align-items: center;
     justify-content: center;
@@ -29,14 +35,13 @@ body {
 }
 
 /* ===============================
-   Name Input Section
+   NAME INPUT SECTION
 ================================ */
 #nameInputSection {
     background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
 }
 
 .sparkle-container {
-    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -45,315 +50,164 @@ body {
 .question-box {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 20px;
-    padding: 40px 60px;
+    padding: 35px 45px;
     text-align: center;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.2);
     transition: transform 0.3s ease;
 }
 
 .question-box:hover {
-    transform: scale(1.05);
+    transform: scale(1.04);
 }
 
 .question-box h2 {
-    font-size: 2.5em;
-    margin-bottom: 30px;
+    font-size: 2.2rem;
     color: #ffd700;
-    text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    margin-bottom: 25px;
 }
 
+/* ===============================
+   INPUT
+================================ */
 #userNameInput {
     width: 100%;
-    padding: 15px 20px;
-    font-size: 1.2em;
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 14px;
+    font-size: 1.1rem;
     border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
     color: #fff;
-    margin-bottom: 20px;
     outline: none;
-    transition: all 0.3s ease;
+    margin-bottom: 20px;
 }
 
 #userNameInput:focus {
     border-color: #ffd700;
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-}
-
-#userNameInput::placeholder {
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.sparkle-btn {
-    padding: 15px 40px;
-    font-size: 1.2em;
-    background: linear-gradient(135deg, #ffd700, #ffed4e);
-    border: none;
-    border-radius: 10px;
-    color: #0a0e27;
-    cursor: pointer;
-    font-weight: bold;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-}
-
-.sparkle-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
-}
-
-.sparkle-btn:active {
-    transform: scale(0.95);
-}
-
-/* Sparkle Effect */
-.sparkle {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: #fff;
-    border-radius: 50%;
-    pointer-events: none;
-    animation: sparkle-animation 0.6s ease-out forwards;
-}
-
-@keyframes sparkle-animation {
-    0% {
-        opacity: 1;
-        transform: scale(0) translate(0, 0);
-    }
-    100% {
-        opacity: 0;
-        transform: scale(1) translate(var(--tx), var(--ty));
-    }
 }
 
 /* ===============================
-   Year Transition Section
+   BUTTONS
+================================ */
+.sparkle-btn,
+.continue-btn {
+    padding: 14px 38px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #0a0e27;
+    transition: all 0.3s ease;
+}
+
+.sparkle-btn:hover,
+.continue-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+}
+
+/* ===============================
+   YEAR TRANSITION
 ================================ */
 #yearTransitionSection {
     background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
 }
 
-.year-container {
-    text-align: center;
-}
-
 .year-text {
-    font-size: 12em;
+    font-size: 9rem;
     font-weight: bold;
     color: #ffd700;
-    text-shadow: 
-        0 0 20px rgba(255, 215, 0, 0.8),
-        0 0 40px rgba(255, 215, 0, 0.6),
-        0 0 60px rgba(255, 215, 0, 0.4);
-    animation: pulse 2s ease-in-out infinite;
-    transition: all 0.5s ease;
-}
-
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
-}
-
-.year-text.transitioning {
-    animation: yearTransition 2s ease-in-out forwards;
-}
-
-@keyframes yearTransition {
-    0% {
-        opacity: 1;
-        transform: scale(1) rotateY(0deg);
-    }
-    50% {
-        opacity: 0.3;
-        transform: scale(0.8) rotateY(90deg);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1) rotateY(0deg);
-    }
-}
-
-.continue-btn {
-    margin-top: 40px;
-    padding: 15px 40px;
-    font-size: 1.2em;
-    background: linear-gradient(135deg, #ffd700, #ffed4e);
-    border: none;
-    border-radius: 10px;
-    color: #0a0e27;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.continue-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+    text-shadow: 0 0 30px rgba(255, 215, 0, 0.7);
 }
 
 /* ===============================
-   360 Space Section
+   360 SPACE
 ================================ */
 #space360Section {
     background: #000;
 }
 
 #canvas-container {
-    width: 100%;
-    height: 100%;
-    position: relative;
-}
-
-/* 🔑 FIXED IMAGE LABEL (MOBILE SAFE) */
-.image-label {
     position: absolute;
-    color: #ffd700;
-    font-size: 22px;
-    font-weight: bold;
-    text-shadow: 
-        0 0 10px rgba(255, 215, 0, 0.9),
-        0 0 20px rgba(255, 215, 0, 0.7),
-        0 0 30px rgba(255, 215, 0, 0.5);
-    pointer-events: none;
-    white-space: normal;
-    max-width: 320px;
-    text-align: center;
-    z-index: 10;
-    font-family: 'Arial', sans-serif;
-}
-
-#continueSpaceBtn {
-    position: absolute;
-    bottom: 50px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 100;
-}
-
-/* ===============================
-   Final Greeting Section
-================================ */
-#finalGreetingSection {
-    background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
-    position: relative;
+    inset: 0;
     overflow: hidden;
 }
 
-#fireworksCanvas {
+/* ===============================
+   360 TEXT LABELS (FIXED)
+================================ */
+.image-label {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
+    max-width: 160px;         /* prevents long lines */
+    text-align: center;
+    font-size: 16px;          /* desktop default */
+    font-weight: 600;
+    line-height: 1.2;
+    color: #ffd700;
     pointer-events: none;
+    white-space: normal;
+    word-break: break-word;
+    text-shadow:
+        0 0 6px rgba(255, 215, 0, 0.8),
+        0 0 12px rgba(255, 215, 0, 0.6);
 }
 
-.greeting-container {
-    text-align: center;
-    position: relative;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
+/* ===============================
+   FINAL GREETING
+================================ */
+#finalGreetingSection {
+    background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+    overflow: hidden;
 }
 
 .greeting-text {
-    font-size: 6em;
+    font-size: 5rem;
     font-weight: bold;
     color: #ffd700;
-    text-shadow: 
-        0 0 20px rgba(255, 215, 0, 0.8),
-        0 0 40px rgba(255, 140, 0, 0.6),
-        0 0 60px rgba(255, 140, 0, 0.4),
-        0 0 80px rgba(255, 140, 0, 0.2);
-    animation: flash 1.5s ease-in-out infinite;
-    letter-spacing: 0.1em;
+    text-align: center;
+    letter-spacing: 0.08em;
 }
 
 /* ===============================
-   Animations
-================================ */
-@keyframes flash {
-    0%, 100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    50% {
-        opacity: 0.8;
-        transform: scale(1.02);
-    }
-}
-
-/* ===============================
-   Fade Transitions
-================================ */
-.fade-out {
-    animation: fadeOut 0.5s ease-out forwards;
-}
-
-.fade-in {
-    animation: fadeIn 0.5s ease-in forwards;
-}
-
-@keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-/* ===============================
-   RESPONSIVE FIXES
+   MOBILE OPTIMIZATION 🔑
 ================================ */
 @media (max-width: 768px) {
-    .year-text {
-        font-size: 6em;
-    }
-
-    .greeting-text {
-        font-size: 3em;
-    }
 
     .question-box {
-        padding: 30px 40px;
+        padding: 25px 30px;
     }
 
     .question-box h2 {
-        font-size: 1.8em;
+        font-size: 1.6rem;
     }
 
-    /* 🔑 360 TEXT MOBILE */
+    .year-text {
+        font-size: 5rem;
+    }
+
+    .greeting-text {
+        font-size: 2.5rem;
+    }
+
+    /* 🔥 KEY FIX FOR 360 TEXT */
     .image-label {
-        font-size: 14px;
-        max-width: 220px;
-        line-height: 1.3;
+        max-width: 110px;
+        font-size: 12px;      /* SMALLER TEXT */
+        line-height: 1.15;
+        text-shadow:
+            0 0 4px rgba(255, 215, 0, 0.7),
+            0 0 8px rgba(255, 215, 0, 0.5);
     }
 }
 
-@media (max-width: 480px) {
+/* ===============================
+   EXTRA SMALL PHONES
+================================ */
+@media (max-width: 420px) {
     .image-label {
-        font-size: 12px;
-        max-width: 180px;
-        line-height: 1.25;
+        max-width: 95px;
+        font-size: 11px;
     }
 }
-
-
