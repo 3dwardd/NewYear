@@ -253,8 +253,6 @@ body {
 
 .greeting-container {
     text-align: center;
-    position: relative;
-    z-index: 2;
 }
 
 .greeting-text {
@@ -326,4 +324,3 @@ body {
         font-size: 1.8em;
     }
 }
-

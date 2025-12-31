@@ -212,7 +212,7 @@ function createImageBox(x, y, z, angle, imageUrl, textContent) {
         if (renderer && renderer.capabilities) {
             texture.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 16);
         }
-        texture.flipY = false;
+        texture.flipY = true; // Fix upside-down images
         
         const screenMaterial = new THREE.MeshBasicMaterial({ 
             map: texture,
@@ -581,3 +581,4 @@ window.addEventListener('resize', () => {
         renderer.setSize(window.innerWidth, window.innerHeight);
     }
 });
+
