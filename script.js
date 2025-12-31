@@ -1,19 +1,344 @@
-const camera = document.querySelector('#camera');
+// Global variables
+let userName = '';
+let scene, camera, renderer;
+let imageBoxes = [];
+let is360Active = false;
 
-function clamp(val, min, max) {
-  return Math.max(min, Math.min(max, val));
+// Initialize the application
+document.addEventListener('DOMContentLoaded', () => {
+    setupNameInput();
+});
+
+// Name Input Section
+function setupNameInput() {
+    const submitBtn = document.getElementById('submitNameBtn');
+    const nameInput = document.getElementById('userNameInput');
+    
+    submitBtn.addEventListener('click', handleNameSubmit);
+    nameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            handleNameSubmit();
+        }
+    });
 }
 
-function updateRotation() {
-  let rotation = camera.getAttribute('rotation');
-
-  // Clamp horizontal (yaw) to ±60°
-  rotation.y = clamp(rotation.y, -60, 60);
-
-  // Clamp vertical (pitch) to ±30°
-  rotation.x = clamp(rotation.x, -30, 30);
-
-  camera.setAttribute('rotation', rotation);
+function handleNameSubmit() {
+    const nameInput = document.getElementById('userNameInput');
+    userName = nameInput.value.trim();
+    
+    if (userName === '') {
+        alert('Please enter your name!');
+        return;
+    }
+    
+    // Create sparkle effect
+    createSparkleEffect();
+    
+    // Hide name input section after a short delay
+    setTimeout(() => {
+        const nameSection = document.getElementById('nameInputSection');
+        nameSection.classList.add('fade-out');
+        
+        setTimeout(() => {
+            nameSection.classList.remove('active');
+            showYearTransition();
+        }, 500);
+    }, 300);
 }
 
-setInterval(updateRotation, 100);
+function createSparkleEffect() {
+    const btn = document.getElementById('submitNameBtn');
+    const rect = btn.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    for (let i = 0; i < 20; i++) {
+        setTimeout(() => {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            
+            const angle = (Math.PI * 2 * i) / 20;
+            const distance = 100 + Math.random() * 50;
+            const tx = Math.cos(angle) * distance;
+            const ty = Math.sin(angle) * distance;
+            
+            sparkle.style.left = centerX + 'px';
+            sparkle.style.top = centerY + 'px';
+            sparkle.style.setProperty('--tx', tx + 'px');
+            sparkle.style.setProperty('--ty', ty + 'px');
+            
+            document.body.appendChild(sparkle);
+            
+            setTimeout(() => {
+                sparkle.remove();
+            }, 600);
+        }, i * 30);
+    }
+}
+
+// Year Transition Section
+function showYearTransition() {
+    const yearSection = document.getElementById('yearTransitionSection');
+    const yearText = document.getElementById('yearText');
+    
+    yearSection.classList.add('active', 'fade-in');
+    yearText.textContent = '2025';
+    
+    // Start transition animation after 1 second
+    setTimeout(() => {
+        yearText.classList.add('transitioning');
+        
+        setTimeout(() => {
+            yearText.textContent = '2026';
+            yearText.classList.remove('transitioning');
+            
+            // Show continue button after transition
+            setTimeout(() => {
+                const continueBtn = document.getElementById('continueYearBtn');
+                continueBtn.style.display = 'block';
+                continueBtn.addEventListener('click', () => {
+                    yearSection.classList.add('fade-out');
+                    setTimeout(() => {
+                        yearSection.classList.remove('active');
+                        show360Space();
+                    }, 500);
+                });
+            }, 500);
+        }, 1000);
+    }, 1000);
+}
+
+// 360 Space Section
+function show360Space() {
+    const spaceSection = document.getElementById('space360Section');
+    spaceSection.classList.add('active', 'fade-in');
+    
+    init360Environment();
+    
+    // Show continue button after a delay
+    setTimeout(() => {
+        const continueBtn = document.getElementById('continueSpaceBtn');
+        continueBtn.style.display = 'block';
+        continueBtn.addEventListener('click', () => {
+            spaceSection.classList.add('fade-out');
+            setTimeout(() => {
+                cleanup360Environment();
+                spaceSection.classList.remove('active');
+                showFinalGreeting();
+            }, 500);
+        });
+    }, 3000);
+}
+
+function init360Environment() {
+    is360Active = true;
+    const container = document.getElementById('canvas-container');
+    
+    // Scene setup
+    scene = new THREE.Scene();
+    
+    // Camera setup
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 0, 0);
+    
+    // Renderer setup
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+    
+    // Create space background (stars)
+    createStarField();
+    
+    // Create 5 image boxes arranged around the x-axis
+    const images = [
+        { url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800', message: 'New Beginnings' },
+        { url: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=800', message: 'Dream Big' },
+        { url: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=800', message: 'Endless Possibilities' },
+        { url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800', message: 'Adventure Awaits' },
+        { url: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800', message: 'Celebrate Life' }
+    ];
+    
+    const radius = 8;
+    const angleStep = (Math.PI * 2) / images.length;
+    
+    images.forEach((img, index) => {
+        const angle = index * angleStep;
+        const x = Math.cos(angle) * radius;
+        const z = Math.sin(angle) * radius;
+        
+        createImageBox(x, 0, z, angle, img.url, img.message);
+    });
+    
+    // Add controls for 360 view
+    setup360Controls();
+    
+    // Start animation loop
+    animate360();
+}
+
+function createStarField() {
+    const starsGeometry = new THREE.BufferGeometry();
+    const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
+    
+    const starsVertices = [];
+    for (let i = 0; i < 10000; i++) {
+        const x = (Math.random() - 0.5) * 2000;
+        const y = (Math.random() - 0.5) * 2000;
+        const z = (Math.random() - 0.5) * 2000;
+        starsVertices.push(x, y, z);
+    }
+    
+    starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
+    const stars = new THREE.Points(starsGeometry, starsMaterial);
+    scene.add(stars);
+}
+
+function createImageBox(x, y, z, angle, imageUrl, message) {
+    // Create box group
+    const group = new THREE.Group();
+    
+    // Create screen (plane with texture)
+    const screenGeometry = new THREE.PlaneGeometry(3, 2);
+    const loader = new THREE.TextureLoader();
+    
+    loader.load(imageUrl, (texture) => {
+        const screenMaterial = new THREE.MeshBasicMaterial({ 
+            map: texture,
+            side: THREE.DoubleSide
+        });
+        const screen = new THREE.Mesh(screenGeometry, screenMaterial);
+        screen.position.set(0, 0.5, 0);
+        group.add(screen);
+    }, undefined, (error) => {
+        // Fallback if image fails to load
+        const screenMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0x444444,
+            side: THREE.DoubleSide
+        });
+        const screen = new THREE.Mesh(screenGeometry, screenMaterial);
+        screen.position.set(0, 0.5, 0);
+        group.add(screen);
+    });
+    
+    // Create frame
+    const frameGeometry = new THREE.BoxGeometry(3.2, 2.2, 0.2);
+    const frameMaterial = new THREE.MeshStandardMaterial({ color: 0x333333 });
+    const frame = new THREE.Mesh(frameGeometry, frameMaterial);
+    frame.position.set(0, 0.5, -0.1);
+    group.add(frame);
+    
+    // Position the group
+    group.position.set(x, y, z);
+    group.lookAt(0, 0, 0);
+    
+    // Store message for later use (could be displayed in UI)
+    group.userData = { message: message };
+    
+    scene.add(group);
+    imageBoxes.push(group);
+}
+
+function setup360Controls() {
+    let isDragging = false;
+    let previousMousePosition = { x: 0, y: 0 };
+    
+    renderer.domElement.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+    });
+    
+    renderer.domElement.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        
+        const deltaX = e.clientX - previousMousePosition.x;
+        const deltaY = e.clientY - previousMousePosition.y;
+        
+        // Rotate camera around Y axis (horizontal)
+        const rotationSpeed = 0.005;
+        camera.rotation.y -= deltaX * rotationSpeed;
+        
+        // Limit vertical rotation
+        camera.rotation.x -= deltaY * rotationSpeed;
+        camera.rotation.x = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, camera.rotation.x));
+        
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+    });
+    
+    renderer.domElement.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+    
+    // Touch controls for mobile
+    renderer.domElement.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+            isDragging = true;
+            previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+    });
+    
+    renderer.domElement.addEventListener('touchmove', (e) => {
+        if (!isDragging || e.touches.length !== 1) return;
+        e.preventDefault();
+        
+        const deltaX = e.touches[0].clientX - previousMousePosition.x;
+        const deltaY = e.touches[0].clientY - previousMousePosition.y;
+        
+        const rotationSpeed = 0.005;
+        camera.rotation.y -= deltaX * rotationSpeed;
+        camera.rotation.x -= deltaY * rotationSpeed;
+        camera.rotation.x = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, camera.rotation.x));
+        
+        previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    });
+    
+    renderer.domElement.addEventListener('touchend', () => {
+        isDragging = false;
+    });
+}
+
+function animate360() {
+    if (!is360Active) return;
+    
+    requestAnimationFrame(animate360);
+    
+    // Rotate image boxes slightly for visual interest
+    imageBoxes.forEach((box, index) => {
+        box.rotation.y += 0.001;
+    });
+    
+    renderer.render(scene, camera);
+}
+
+function cleanup360Environment() {
+    is360Active = false;
+    const container = document.getElementById('canvas-container');
+    
+    if (renderer) {
+        container.removeChild(renderer.domElement);
+        renderer.dispose();
+    }
+    
+    scene = null;
+    camera = null;
+    renderer = null;
+    imageBoxes = [];
+}
+
+// Final Greeting Section
+function showFinalGreeting() {
+    const greetingSection = document.getElementById('finalGreetingSection');
+    const greetingText = document.getElementById('finalGreeting');
+    
+    greetingText.textContent = `HAPPY NEW YEAR ${userName.toUpperCase()}!`;
+    greetingSection.classList.add('active', 'fade-in');
+}
+
+// Handle window resize
+window.addEventListener('resize', () => {
+    if (camera && renderer) {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+});

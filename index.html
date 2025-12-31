@@ -1,24 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Framed Image Viewer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy New Year 2026</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <a-scene embedded>
-    <!-- Frame background -->
-    <a-plane color="#333" position="0 1.6 -5" width="6.2" height="4.2"></a-plane>
+    <!-- Name Input Section -->
+    <div id="nameInputSection" class="section active">
+        <div class="sparkle-container">
+            <div class="question-box">
+                <h2>What's your name?</h2>
+                <input type="text" id="userNameInput" placeholder="Enter your name..." autocomplete="off">
+                <button id="submitNameBtn" class="sparkle-btn">Continue</button>
+            </div>
+        </div>
+    </div>
 
-    <!-- Your image inside the frame -->
-    <a-plane src="flowers1.png" position="0 1.6 -5.01" width="6" height="4"></a-plane>
+    <!-- Year Transition Section -->
+    <div id="yearTransitionSection" class="section">
+        <div class="year-container">
+            <div id="yearText" class="year-text">2025</div>
+            <button id="continueYearBtn" class="continue-btn" style="display: none;">Continue</button>
+        </div>
+    </div>
 
-    <!-- Camera with limited look-controls -->
-    <a-entity id="camera" camera look-controls position="0 1.6 0"></a-entity>
-  </a-scene>
+    <!-- 360 Space Section -->
+    <div id="space360Section" class="section">
+        <div id="canvas-container"></div>
+        <button id="continueSpaceBtn" class="continue-btn" style="display: none;">Continue</button>
+    </div>
 
-  <script src="script.js"></script>
+    <!-- Final Greeting Section -->
+    <div id="finalGreetingSection" class="section">
+        <div class="greeting-container">
+            <h1 id="finalGreeting" class="greeting-text">HAPPY NEW YEAR</h1>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
+
