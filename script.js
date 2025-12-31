@@ -153,11 +153,11 @@ function init360Environment() {
     
     // Create 5 image boxes arranged around the x-axis
     const images = [
-        { url: 'picture1.jpg', text: 'Text content 1' },
-        { url: 'picture2.jpg', text: 'Text content 2' },
-        { url: 'picture3.jpg', text: 'Text content 3' },
-        { url: 'picture4.jpg', text: 'Text content 4' },
-        { url: 'picture5.jpg', text: 'Text content 5' }
+        { url: 'picture1.png', text: 'Text content 1' },
+        { url: 'picture2.png', text: 'Text content 2' },
+        { url: 'picture3.png', text: 'Text content 3' },
+        { url: 'picture4.png', text: 'Text content 4' },
+        { url: 'picture5.png', text: 'Text content 5' }
     ];
     
     const radius = 4; // Closer to user
