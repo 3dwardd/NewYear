@@ -160,7 +160,7 @@ function init360Environment() {
         { url: 'picture5.png', text: 'Text content 5' }
     ];
     
-    const radius = 6; // Increased radius for more spacing
+    const radius = 8; // Increased radius for more spacing between images
     // Arrange images in a full circle (360 degrees) with better spacing
     const angleStep = (Math.PI * 2) / images.length; // Full circle divided by number of images
     
@@ -243,8 +243,8 @@ function createImageBox(x, y, z, angle, imageUrl, textContent) {
     group.position.set(x, y, z);
     group.lookAt(0, 0, 0);
     
-    // Store text and position for HTML overlay
-    group.userData = { text: textContent, worldPos: new THREE.Vector3(x, y - 1.5, z) };
+    // Store text and position for HTML overlay - increased spacing between image and text
+    group.userData = { text: textContent, worldPos: new THREE.Vector3(x, y - 2.5, z) };
     
     // Create HTML text label overlay
     const textDiv = document.createElement('div');
@@ -340,8 +340,8 @@ function animate360() {
 
 function updateTextLabels() {
     textLabels.forEach(({ element, group }) => {
-        // Get world position of the text (below image)
-        const worldPos = new THREE.Vector3(0, -1.5, 0);
+        // Get world position of the text (below image) - increased spacing
+        const worldPos = new THREE.Vector3(0, -2.5, 0);
         worldPos.applyMatrix4(group.matrixWorld);
         
         // Project 3D position to 2D screen coordinates
@@ -420,24 +420,29 @@ function startFireworks() {
     const fireworks = [];
     const particles = [];
     
-    // Color palette for realistic fireworks (red, blue, green, yellow, purple, orange, pink, cyan)
+    // Color palette for realistic fireworks - vibrant and diverse colors
     const fireworkColors = [
-        { hue: 0, name: 'red' },      // Red
-        { hue: 240, name: 'blue' },   // Blue
-        { hue: 120, name: 'green' },  // Green
-        { hue: 60, name: 'yellow' },  // Yellow
-        { hue: 270, name: 'purple' }, // Purple
-        { hue: 30, name: 'orange' },  // Orange
-        { hue: 330, name: 'pink' },   // Pink
-        { hue: 180, name: 'cyan' },   // Cyan
-        { hue: 300, name: 'magenta' }, // Magenta
-        { hue: 15, name: 'gold' }     // Gold
+        { hue: 0, name: 'red' },        // Red
+        { hue: 15, name: 'orange-red' }, // Orange-red
+        { hue: 30, name: 'orange' },     // Orange
+        { hue: 45, name: 'amber' },      // Amber
+        { hue: 60, name: 'yellow' },     // Yellow
+        { hue: 90, name: 'lime' },      // Lime
+        { hue: 120, name: 'green' },     // Green
+        { hue: 150, name: 'turquoise' }, // Turquoise
+        { hue: 180, name: 'cyan' },      // Cyan
+        { hue: 210, name: 'sky-blue' },  // Sky blue
+        { hue: 240, name: 'blue' },      // Blue
+        { hue: 270, name: 'purple' },    // Purple
+        { hue: 300, name: 'magenta' },   // Magenta
+        { hue: 330, name: 'pink' },      // Pink
+        { hue: 345, name: 'rose' }       // Rose
     ];
     
     function getRandomColor() {
         const color = fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
-        // Add some variation to the hue for more natural look
-        return color.hue + (Math.random() * 20 - 10);
+        // Return the base hue - variation will be added per particle
+        return color.hue;
     }
     
     class Firework {
@@ -461,13 +466,21 @@ function startFireworks() {
         
         explode() {
             this.exploded = true;
-            const particleCount = 80; // More particles for richer effect
-            const baseHue = this.hue;
+            const particleCount = 100; // More particles for richer effect
+            
+            // Create multi-colored explosion - each firework has multiple distinct colors
+            const explosionColors = [];
+            const numColors = 3 + Math.floor(Math.random() * 4); // 3-6 different colors per explosion
+            
+            for (let c = 0; c < numColors; c++) {
+                explosionColors.push(getRandomColor());
+            }
             
             for (let i = 0; i < particleCount; i++) {
-                // Each particle can have slightly different hue for more colorful effect
-                const hueVariation = baseHue + (Math.random() * 40 - 20);
-                particles.push(new Particle(this.x, this.y, hueVariation));
+                // Randomly assign one of the explosion colors to each particle
+                const colorIndex = Math.floor(Math.random() * explosionColors.length);
+                const particleHue = explosionColors[colorIndex] + (Math.random() * 15 - 7.5); // Slight variation
+                particles.push(new Particle(this.x, this.y, particleHue));
             }
         }
         
